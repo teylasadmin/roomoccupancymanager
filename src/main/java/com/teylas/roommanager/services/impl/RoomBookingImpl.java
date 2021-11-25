@@ -9,6 +9,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.teylas.roommanager.Utils.formatDecimal;
+
 @Service
 public class RoomBookingImpl implements RoomBooking {
     private List<Double> premiumCustomerMoney;
@@ -22,11 +24,24 @@ public class RoomBookingImpl implements RoomBooking {
     }
 
     @Override
-    public double getProfitPerRoomType(RoomType roomType, int numberOfRooms) {
+    public String getProfitPerRoomType(RoomType roomType, int numberOfRooms) {
+        String outputStatement = "";
+        Double profit = 0.0;
+        int occupiedRooms = 0;
         switch(roomType){
-            case ECONOMY: return economyCustomerMoney.stream().limit(numberOfRooms).reduce(0.0, Double::sum);
-            case PREMIUM:return premiumCustomerMoney.stream().limit(numberOfRooms).reduce(0.0, Double::sum);
+            case ECONOMY: {
+                profit = economyCustomerMoney.stream().limit(numberOfRooms).reduce(0.0, Double::sum);
+                occupiedRooms = numberOfRooms > economyCustomerMoney.size()? economyCustomerMoney.size():numberOfRooms;
+                break;
+            }
+            case PREMIUM: {
+                profit = premiumCustomerMoney.stream().limit(numberOfRooms).reduce(0.0, Double::sum);
+                occupiedRooms = numberOfRooms > premiumCustomerMoney.size()? premiumCustomerMoney.size():numberOfRooms;
+                break;
+            }
             default: throw new RuntimeException("Unsupported room type");
         }
+        outputStatement = String.format("Usage %s: %s (EUR %s)",roomType.getType(),occupiedRooms, formatDecimal(profit));
+        return outputStatement;
     }
 }

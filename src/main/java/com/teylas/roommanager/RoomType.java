@@ -1,5 +1,14 @@
 package com.teylas.roommanager;
 
 public enum RoomType {
-    ECONOMY, PREMIUM
+    ECONOMY("Economy"), PREMIUM("Premium");
+
+    RoomType(String type) {
+        this.type = type;
+    }
+    private String type;
+
+    public String getType() {
+        return type;
+    }
 }
