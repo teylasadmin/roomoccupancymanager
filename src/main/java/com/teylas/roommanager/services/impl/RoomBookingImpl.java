@@ -3,10 +3,8 @@ package com.teylas.roommanager.services.impl;
 import com.teylas.roommanager.RoomType;
 import com.teylas.roommanager.services.RoomBooking;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,6 +12,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import static com.teylas.roommanager.Utils.formatDecimal;
 
 @Service
@@ -45,7 +44,6 @@ public class RoomBookingImpl implements RoomBooking {
     public String getProfitPerRoomType(int numberOfEconomyRooms, int numberOfPremiumRooms) {
         StringBuffer stringBuffer = new StringBuffer();
 
-        String outputStatement = "";
         Double profitEconomy = 0.0;
         Double profitPremium = 0.0;
         int occupiedEconomyRooms = 0;
@@ -63,12 +61,13 @@ public class RoomBookingImpl implements RoomBooking {
             occupiedPremiumRooms+=numberOfUpgrades;
         }
 
-        profitEconomy = economyCustomerMoney.subList(numberOfUpgrades ,economyCustomerMoney.size()-1).stream().limit(numberOfEconomyRooms).reduce(0.0, Double::sum);
+        profitEconomy = economyCustomerMoney.subList(numberOfUpgrades ,economyCustomerMoney.size()).stream().limit(numberOfEconomyRooms).reduce(0.0, Double::sum);
         occupiedEconomyRooms = numberOfEconomyRooms > economyCustomerMoney.size()? economyCustomerMoney.size():numberOfEconomyRooms;
 
-        stringBuffer.append(String.format("Usage %s: %s (EUR %s)",RoomType.ECONOMY.getType(),occupiedEconomyRooms, formatDecimal(profitEconomy)));
-        stringBuffer.append(System.lineSeparator());
         stringBuffer.append(String.format("Usage %s: %s (EUR %s)",RoomType.PREMIUM.getType(),occupiedPremiumRooms, formatDecimal(profitPremium)));
+        stringBuffer.append(System.lineSeparator());
+        stringBuffer.append(String.format("Usage %s: %s (EUR %s)",RoomType.ECONOMY.getType(),occupiedEconomyRooms, formatDecimal(profitEconomy)));
+
         return stringBuffer.toString();
     }
 }
