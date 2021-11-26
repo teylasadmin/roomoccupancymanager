@@ -42,30 +42,33 @@ public class RoomBookingImpl implements RoomBooking {
     }
 
     @Override
-    public String getProfitPerRoomType(RoomType roomType, int numberOfRooms) {
+    public String getProfitPerRoomType(int numberOfEconomyRooms, int numberOfPremiumRooms) {
+        StringBuffer stringBuffer = new StringBuffer();
+
         String outputStatement = "";
-        Double profit = 0.0;
-        int occupiedRooms = 0;
+        Double profitEconomy = 0.0;
+        Double profitPremium = 0.0;
+        int occupiedEconomyRooms = 0;
+        int occupiedPremiumRooms = 0;
+        int numberOfUpgrades = 0;
 
-        switch(roomType){
-            case ECONOMY: {
-                profit = economyCustomerMoney.stream().limit(numberOfRooms).reduce(0.0, Double::sum);
-                occupiedRooms = numberOfRooms > economyCustomerMoney.size()? economyCustomerMoney.size():numberOfRooms;
-                break;
-            }
-            case PREMIUM: {
-                profit = premiumCustomerMoney.stream().limit(numberOfRooms).reduce(0.0, Double::sum);
-                occupiedRooms = numberOfRooms > premiumCustomerMoney.size()? premiumCustomerMoney.size():numberOfRooms;
-                int eligibleForUpgrade = numberOfRooms - occupiedRooms;
-                if(eligibleForUpgrade >0) {
-                    profit = economyCustomerMoney.stream().limit(eligibleForUpgrade).reduce(profit, Double::sum);
-                }
+        profitPremium = premiumCustomerMoney.stream().limit(numberOfPremiumRooms).reduce(0.0, Double::sum);
+        occupiedPremiumRooms = numberOfPremiumRooms > premiumCustomerMoney.size()? premiumCustomerMoney.size():numberOfPremiumRooms;
 
-                break;
-            }
-            default: throw new RuntimeException("Unsupported room type");
+        int guestsNeedingUpgrade = economyCustomerMoney.size() - numberOfEconomyRooms;
+        int roomsAvailableForUpgrade = numberOfPremiumRooms - occupiedPremiumRooms;
+        if(guestsNeedingUpgrade > 0 && roomsAvailableForUpgrade >0) {
+            profitPremium = economyCustomerMoney.stream().limit(roomsAvailableForUpgrade).reduce(profitPremium, Double::sum);
+            numberOfUpgrades = (guestsNeedingUpgrade>roomsAvailableForUpgrade)?roomsAvailableForUpgrade:guestsNeedingUpgrade;
+            occupiedPremiumRooms+=numberOfUpgrades;
         }
-        outputStatement = String.format("Usage %s: %s (EUR %s)",roomType.getType(),occupiedRooms, formatDecimal(profit));
-        return outputStatement;
+
+        profitEconomy = economyCustomerMoney.subList(numberOfUpgrades ,economyCustomerMoney.size()-1).stream().limit(numberOfEconomyRooms).reduce(0.0, Double::sum);
+        occupiedEconomyRooms = numberOfEconomyRooms > economyCustomerMoney.size()? economyCustomerMoney.size():numberOfEconomyRooms;
+
+        stringBuffer.append(String.format("Usage %s: %s (EUR %s)",RoomType.ECONOMY.getType(),occupiedEconomyRooms, formatDecimal(profitEconomy)));
+        stringBuffer.append(System.lineSeparator());
+        stringBuffer.append(String.format("Usage %s: %s (EUR %s)",RoomType.PREMIUM.getType(),occupiedPremiumRooms, formatDecimal(profitPremium)));
+        return stringBuffer.toString();
     }
 }

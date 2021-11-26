@@ -3,5 +3,5 @@ package com.teylas.roommanager.services;
 import com.teylas.roommanager.RoomType;
 
 public interface RoomBooking {
-    public String getProfitPerRoomType(RoomType roomType, int numberOfRooms);
+    public String getProfitPerRoomType(int numberOfEconomyRooms, int numberOfPremiumRooms);
 }
