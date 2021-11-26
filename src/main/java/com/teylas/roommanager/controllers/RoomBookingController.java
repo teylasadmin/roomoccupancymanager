@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 public class RoomBookingController {
 
     @Autowired
-    RoomBookingImpl roomBooking;
+    private RoomBookingImpl roomBooking;
 
     @PostMapping(path = "/profit-per-type", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> roomProfitability(@RequestBody String numberOfRoomsPerType) {
