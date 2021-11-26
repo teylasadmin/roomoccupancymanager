@@ -4,6 +4,7 @@ import com.teylas.roommanager.services.impl.RoomBookingImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ public class RoomBookingController {
     @Autowired
     RoomBookingImpl roomBooking;
 
-    @PostMapping(path = "/profit-per-type")
+    @PostMapping(path = "/profit-per-type", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> roomProfitability(@RequestBody String numberOfRoomsPerType) {
         if(StringUtils.isBlank(numberOfRoomsPerType))
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
